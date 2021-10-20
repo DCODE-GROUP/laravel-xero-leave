@@ -19,14 +19,6 @@ return [
     'leave_model' => Dcodegroup\LaravelXeroLeave\Models\Leave::class,
 
     /*
-     * The name of the base layout to wrap the pages in.
-     * The exposed routes will have to know the layout of the app in order to
-     * Appear to look like the rest of the site.
-     */
-
-    'admin_app_layout' => env('LARAVEL_XERO_LEAVE_APP_LAYOUT', 'layouts.admin'),
-
-    /*
      * Some apps require leave to be approved others do not. We provide the functionality to select if a leave request
      * should automatically be sent to Xero or if it should only be sent via another method.
      *

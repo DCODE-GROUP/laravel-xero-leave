@@ -5,6 +5,7 @@ namespace Dcodegroup\LaravelXeroLeave\Models;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Leave extends Model
@@ -32,6 +33,10 @@ class Leave extends Model
         'is_approved' => 'boolean',
     ];
 
+    public function leavable(): MorphTo
+    {
+        return $this->morphTo();
+    }
 
     public function scopeFailedXeroSync(Builder $query): Builder
     {

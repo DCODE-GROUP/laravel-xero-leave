@@ -5,6 +5,7 @@ namespace Dcodegroup\LaravelXeroLeave;
 use Dcodegroup\LaravelXeroLeave\Commands\AutoUpdateXeroConfigurationData;
 use Dcodegroup\LaravelXeroLeave\Commands\InstallCommand;
 use Dcodegroup\LaravelXeroLeave\Observers\LaravelXeroLeaveObserver;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\ServiceProvider;
 use XeroPHP\Application;
@@ -22,7 +23,7 @@ class LaravelXeroLeaveServiceProvider extends ServiceProvider
         $leaveClass = config('laravel-xero-leave.leave_model');
         $leaveClass::observe(new LaravelXeroLeaveObserver());
 
-        //$this->registerResources();
+        $this->registerResources();
         //$this->registerRoutes();
     }
 
@@ -60,4 +61,21 @@ class LaravelXeroLeaveServiceProvider extends ServiceProvider
             ]);
         }
     }
+
+    protected function registerResources()
+    {
+        $this->loadTranslationsFrom(__DIR__.'/../resources/lang', 'laravel-xero-leave-translations');
+        //$this->loadViewsFrom(__DIR__.'/../resources/views', 'laravel-xero-leave-views');
+    }
+
+    //protected function registerRoutes()
+    //{
+    //    Route::group([
+    //                     'prefix' => config('laravel-xero-leave.path'),
+    //                     'as' => Str::slug(config('laravel-xero-leave.as'), '_').'.',
+    //                     'middleware' => config('laravel-xero-leave.middleware', 'web'),
+    //                 ], function () {
+    //        $this->loadRoutesFrom(__DIR__.'/../routes/laravel_xero_leave.php');
+    //    });
+    //}
 }

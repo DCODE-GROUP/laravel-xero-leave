@@ -77,6 +77,28 @@ updated_at timestamp NULL
 
 Most of configuration has been set the fair defaults. However you can review the configuration file at `config/laravel-xero-leave.php` and adjust as needed
 
+
+
+## Usage
+
+You should implement your own frontend to this package. However the model and the events etc are already fired for you. Below will guide you through what you need to do.
+
+Create your own `Leave::class` model class that extends the packages model.
+
+```php
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Dcodegroup\LaravelXeroLeave\Models\Leave as BaseLeave;
+
+class Leave extends BaseLeave
+{
+    use HasFactory;
+    ...
+```
+
 ## Jobs
 
 
