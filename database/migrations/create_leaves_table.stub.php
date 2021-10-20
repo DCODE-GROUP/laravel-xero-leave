@@ -1,6 +1,5 @@
 <?php
 
-use Dcodegroup\LaravelXeroLeave\Models\Leave;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -11,7 +10,7 @@ class CreateLeavesTable extends Migration
     {
         Schema::create('leaves', function (Blueprint $table) {
             $table->id();
-            $table->foreignIdFor(Leave::class);
+            $table->nullableMorphs('leaveable');
             $table->string('xero_leave_application_id', 50)->nullable()->comment('The identifier returned from xero');
             $table->string('xero_employee_id', 50)->nullable()->comment('Just saves having to do a lookup all the time');
             $table->string('xero_leave_type_id', 50)->nullable()->comment('The identifier returned from xero stored in the configuration');
