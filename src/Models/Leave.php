@@ -2,14 +2,15 @@
 
 namespace Dcodegroup\LaravelXeroLeave\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Database\Eloquent\Builder;
 
 class Leave extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory;
+    use SoftDeletes;
 
     /**
      * The attributes that aren't mass assignable.
@@ -41,5 +42,4 @@ class Leave extends Model
     //{
     //
     //}
-
 }

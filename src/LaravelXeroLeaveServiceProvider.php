@@ -42,7 +42,7 @@ class LaravelXeroLeaveServiceProvider extends ServiceProvider
     {
         $this->publishes([__DIR__.'/../config/laravel-xero-leave.php' => config_path('laravel-xero-leave.php')], 'laravel-xero-leave-config');
 
-        if (!Schema::hasTable('leaves')) {
+        if (! Schema::hasTable('leaves')) {
             $timestamp = date('Y_m_d_His', time());
 
             $this->publishes([
