@@ -23,7 +23,7 @@ class BaseXeroLeaveService extends BaseXeroService
         return $this->getModel(PayItem::class, null, 'LeaveTypes');
     }
 
-    public function save(Request $request, Model $leave = null)
+    public function save(Request $request, Model $leave = null): Model|Leave|null
     {
         $leave = $leave ?: new Leave;
         $user = User::findOrFail($request->input('user_id'));
@@ -40,11 +40,9 @@ class BaseXeroLeaveService extends BaseXeroService
 
         $leave->xero_employee_id = $user->xero_employee_id;
 
-        if (!config('laravel-xero-leave.applications_require_approval')) {
-            $leave->is_approve = true;
-        }
-
         $leave->save();
+
+        return $leave->fresh();
     }
 
     public function sendLeaveToXero(Model $leave)

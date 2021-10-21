@@ -3,6 +3,9 @@
 namespace Dcodegroup\LaravelXeroLeave\Models;
 
 use Dcodegroup\LaravelConfiguration\Models\Configuration;
+use Dcodegroup\LaravelXeroLeave\Events\LeaveApproved;
+use Dcodegroup\LaravelXeroLeave\Events\LeaveDeclined;
+use Dcodegroup\LaravelXeroLeave\Events\SendLeaveToXero;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -69,6 +72,12 @@ class Leave extends Model
             'approved_at' => now(),
             'declined_at' => null,
         ]);
+
+        if (config('laravel-xero-leave.applications_require_approval')) {
+            event(new LeaveApproved($this));
+        }
+
+        event(new SendLeaveToXero($this));
     }
 
     public function decline(): void
@@ -77,6 +86,8 @@ class Leave extends Model
             'approved_at' => null,
             'declined_at' => now(),
         ]);
+
+        event(new LeaveDeclined($this));
     }
 
     public function getStatusAttribute(): string
