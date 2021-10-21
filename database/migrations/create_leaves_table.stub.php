@@ -19,10 +19,11 @@ class CreateLeavesTable extends Migration
             $table->double('units', 8, 2)->nullable()->comment('in case the period is less than one day');
             $table->string('title', 50);
             $table->string('description', 200)->nullable();
-            $table->boolean('is_approved')->default(false);
             $table->json('xero_periods')->nullable();
             $table->text('xero_exception_message')->nullable();
             $table->mediumText('xero_exception')->nullable();
+            $table->timestamp('approved_at')->nullable();
+            $table->timestamp('declined_at')->nullable();
             $table->timestamp('xero_synced_at')->nullable();
             $table->softDeletes();
             $table->timestamps();
