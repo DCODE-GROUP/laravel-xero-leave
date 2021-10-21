@@ -13,5 +13,4 @@ class LaravelXeroLeaveObserver
             event(new SendLeaveToXero($leave));
         }
     }
-
 }
