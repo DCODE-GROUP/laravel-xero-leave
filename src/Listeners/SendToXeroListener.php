@@ -10,7 +10,5 @@ class SendToXeroListener
     public function handle(SendLeaveToXero $event)
     {
         $service = resolve(BaseXeroLeaveService::class);
-
-
     }
 }
