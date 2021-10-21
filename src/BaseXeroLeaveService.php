@@ -26,7 +26,7 @@ class BaseXeroLeaveService extends BaseXeroService
     public function save(Request $request, Model $leave = null): Model|Leave|null
     {
         $leave = $leave ?: new Leave();
-        $user = User::findOrFail($request->input('user_id'));
+        $user = User::findOrFail($request->input('leaveable_id'));
 
         $leave->fill($request->only(['title' ,'description', 'start_date', 'end_date', 'xero_leave_type_id', 'units']));
 
@@ -41,6 +41,8 @@ class BaseXeroLeaveService extends BaseXeroService
         $leave->xero_employee_id = $user->xero_employee_id;
 
         $leave->save();
+
+        $leave->leavable()->attach($user);
 
         return $leave->fresh();
     }

@@ -98,6 +98,16 @@ class Leave extends BaseLeave
     ...
 ```
 
+Ensure to add the following trait to the model you will use leave with. eg `App\Models\User::class`
+
+```php
+
+class User extends Authenticatable 
+{
+    use HasLeave;
+    ...
+```
+
 ## Events 
 
 Communicating with Xero works by firing events. These events have listeners which will fire the listeners and dispatch jobs.
