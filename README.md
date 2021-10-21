@@ -64,9 +64,10 @@ end_date date
 units double(8,2) # in case the duration is less than a day
 title varchar(50)
 description varchar(200) NULL
-is_approved tinyint(1) DEFAULT=0
 xero_periods json NULL
 xero_exception_message text NULL
+approved_at timestamp NULL
+declined_at timestamp NULL
 xero_synced_at timestamp NULL
 deleted_at timestamp NULL
 created_at timestamp NULL
@@ -76,8 +77,6 @@ updated_at timestamp NULL
 ## Configuration
 
 Most of configuration has been set the fair defaults. However you can review the configuration file at `config/laravel-xero-leave.php` and adjust as needed
-
-
 
 ## Usage
 
@@ -99,6 +98,56 @@ class Leave extends BaseLeave
     ...
 ```
 
+## Events 
+
+Communicating with Xero works by firing events. These events have listeners which will fire the listeners and dispatch jobs.
+
+All events accept the `Leave::class` as the only parameter.
+
+`SendLeaveToXero::class` send the leave record to Xero. This has a listener blah then then dispatches the job SendToXero
+`LeaveApproved::class` When the leave is changed to approved it will fire this event. This will trigger the sending leave to xero
+`LeaveDeclined::class` When the leave is changed to un-approved it will fire this event. This will trigger the sending leave to xero (normally an update of the current application)
+`RequestLeaveApproval::class` If the configuration parameter `laravel-xero-leave.applications_require_approval` is true and a new leave request is created then this event will be fired. You can listen to it in your own application fire a notification or email informing who action needs taking.
+
+A request class is already present in this package. You can update and use the code below for your store and update classes in your own controllers.
+
+```php
+
+use App\Http\Controllers\Controller;
+use Dcodegroup\LaravelXeroLeave\BaseXeroLeaveService;
+use Dcodegroup\LaravelXeroLeave\Http\Requests\StoreLeave;
+
+class LeaveController extends Controller
+{
+    protected BaseXeroLeaveService $service;
+
+    public function __construct()
+    {
+        $this->service = resolve(BaseXeroLeaveService::class);
+    }
+
+    public function store(StoreLeave $request)
+    {
+        $this->authorize('create', Leave::class);
+
+        $this->service->save($request);
+        
+        ...        
+    }
+
+    public function update(StoreLeave $request, Model $leave)
+    {
+        $this->authorize('update', $leave);
+
+        $this->service->save($request, $leave);
+        
+        ....
+    }
+
+    ...
+```
+
+
 ## Jobs
 
 
@@ -109,6 +158,24 @@ class Leave extends BaseLeave
 
 `laravel-xero-leave:update-xero-configuration-data` will fetch and store the leave types in the database. You can use `--force
  to ensure it runs now.
+
+
+You should add it to your `app/Console/Kernel.php` file to run it once a day. You could run it more often if wanted with the --force flag
+
+```php
+    /**
+     * Define the application's command schedule.
+     *
+     * @param Schedule $schedule
+     * @return void
+     */
+    protected function schedule(Schedule $schedule)
+    {
+        $schedule->command('laravel-xero-leave:update-xero-configuration-data')->daily();    
+        ...
+    }
+
+```
 
 ## Resources
 

@@ -2,6 +2,7 @@
 
 namespace Dcodegroup\LaravelXeroLeave\Models;
 
+use Dcodegroup\LaravelConfiguration\Models\Configuration;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -26,11 +27,12 @@ class Leave extends Model
      * @var array
      */
     protected $casts = [
-        'start_date' => 'date',
+        'approved_at' => 'datetime',
+        'declined_at' => 'datetime',
         'end_date' => 'date',
-        'xero_synced_at' => 'date',
+        'start_date' => 'date',
         'xero_periods' => 'json',
-        'is_approved' => 'boolean',
+        'xero_synced_at' => 'datetime',
     ];
 
     public function leavable(): MorphTo
@@ -43,8 +45,59 @@ class Leave extends Model
         return $query->whereNotNull('xero_exception_message');
     }
 
-    //public function hasSuccessfullySynced(): bool
-    //{
-    //
-    //}
+    /**
+     * @return mixed
+     */
+    public static function getLeaveTypeOptions()
+    {
+        return Configuration::byKey('xero_leave_types')->pluck('value')->flatten(1)->map(function ($item) {
+            return [
+                'label' => $item['Name'],
+                'value' => $item['LeaveTypeID'],
+            ];
+        });
+    }
+
+    public static function getValidXeroLeaveTypes(): array
+    {
+        return Configuration::byKey('xero_leave_types')->pluck('value')->flatten(1)->pluck('LeaveTypeID')->toArray();
+    }
+
+    public function approve(): void
+    {
+        $this->update([
+            'approved_at' => now(),
+            'declined_at' => null,
+        ]);
+    }
+
+    public function decline(): void
+    {
+        $this->update([
+            'approved_at' => null,
+            'declined_at' => now(),
+        ]);
+    }
+
+    public function getStatusAttribute(): string
+    {
+        if (config('laravel-xero-leave.applications_require_approval') && empty($this->approved_at) && empty($this->declined_at)) {
+            return __('laravel-xero-leave-translations::laravel-xero-leave.status.pending');
+        }
+
+        if (!empty($this->approved_at)) {
+            return __('laravel-xero-leave-translations::laravel-xero-leave.status.approved');
+        }
+
+        if (!empty($this->declined_at)) {
+            return __('laravel-xero-leave-translations::laravel-xero-leave.status.declined');
+        }
+
+        return __('laravel-xero-leave-translations::laravel-xero-leave.status.unknown');
+    }
+
+    public function hasXeroLeaveApplicationId(): bool
+    {
+        return !empty($this->xero_leave_application_id);
+    }
 }

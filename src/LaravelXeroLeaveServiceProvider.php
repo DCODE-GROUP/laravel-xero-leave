@@ -4,8 +4,10 @@ namespace Dcodegroup\LaravelXeroLeave;
 
 use Dcodegroup\LaravelXeroLeave\Commands\AutoUpdateXeroConfigurationData;
 use Dcodegroup\LaravelXeroLeave\Commands\InstallCommand;
+use Dcodegroup\LaravelXeroLeave\Events\SendLeaveToXero;
+use Dcodegroup\LaravelXeroLeave\Listeners\SendToXeroListener;
 use Dcodegroup\LaravelXeroLeave\Observers\LaravelXeroLeaveObserver;
-use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\ServiceProvider;
 use XeroPHP\Application;
@@ -22,6 +24,8 @@ class LaravelXeroLeaveServiceProvider extends ServiceProvider
 
         $leaveClass = config('laravel-xero-leave.leave_model');
         $leaveClass::observe(new LaravelXeroLeaveObserver());
+
+        Event::listen(SendLeaveToXero::class, SendToXeroListener::class);
 
         $this->registerResources();
         //$this->registerRoutes();
