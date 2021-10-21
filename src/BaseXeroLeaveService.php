@@ -25,7 +25,7 @@ class BaseXeroLeaveService extends BaseXeroService
 
     public function save(Request $request, Model $leave = null): Model|Leave|null
     {
-        $leave = $leave ?: new Leave;
+        $leave = $leave ?: new Leave();
         $user = User::findOrFail($request->input('user_id'));
 
         $leave->fill($request->only(['title' ,'description', 'start_date', 'end_date', 'xero_leave_type_id', 'units']));
@@ -53,13 +53,11 @@ class BaseXeroLeaveService extends BaseXeroService
 
 
 
-        if ($leave->start_date->eq($leave->end_date) && !empty($leave->units)) {
+        if ($leave->start_date->eq($leave->end_date) && ! empty($leave->units)) {
             /**
              * is the same day so we need to work out the period.
              * units are not empty so its less than a day
              */
-
-
         }
 
         $leaveParameters = [
@@ -76,7 +74,7 @@ class BaseXeroLeaveService extends BaseXeroService
                 LeaveApplication::class,
                 (object) [
                     'identifier' => 'LeaveApplicationID',
-                    'guid'       => $leave->xero_leave_application_id,
+                    'guid' => $leave->xero_leave_application_id,
                 ],
                 $leaveParameters,
             );
@@ -84,18 +82,14 @@ class BaseXeroLeaveService extends BaseXeroService
             $response = $this->saveModel(
                 LeaveApplication::class,
                 $leaveParameters,
-
             );
         }
 
 
         //logger('response: '.json_encode($response));
-
     }
 
     private function createPeriod()
     {
-
     }
-
 }
