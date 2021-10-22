@@ -22,11 +22,11 @@ class StoreLeave extends FormRequest
     {
         return [
             'description' => 'nullable|max:200',
-            'start_date' => 'required|date|before_or_equal:end_date',
             'end_date' => 'required|date|after_or_equal:start_date',
+            'leaveable_id' => 'required|integer|exists:users,id',
+            'start_date' => 'required|date|before_or_equal:end_date',
             'title' => 'required|min:3|max:50',
             'units' => 'nullable|numeric|min:0.5|max:'.config('laravel-xero-leave.default_work_hours'),
-            'leavable_id' => 'required|integer|exists:users,id',
             'xero_leave_type_id' => ['required','string', Rule::in(Leave::getValidXeroLeaveTypes())],
         ];
     }
