@@ -112,70 +112,98 @@ Example Vue component to update the status of leave that require approval
 
 ```vue
 <template>
-  <td>
-    <menu>
-      <ul>
-        <li>
-          <button class="button primary active">
-            {{ currentStatus }}
-          </button>
-          <ul class="right">
-            <li>
-              <a @click="submit('approve')">
-                Approve
-              </a>
-            </li>
-            <li>
-              <a @click="submit('decline')">
-                Decline
-              </a>
-            </li>
-            <li>
-              <a @click="submit('pending')">
-                Pending
-              </a>
-            </li>
-          </ul>
-        </li>
-      </ul>
-    </menu>
-  </td>
+ <td>
+  <menu>
+   <ul>
+    <li>
+     <button class="button primary active">
+      {{ currentStatus }}
+     </button>
+     <ul class="right">
+      <li>
+       <a @click="submit('approve')">
+        Approve
+       </a>
+      </li>
+      <li>
+       <a @click="submit('decline')">
+        Decline
+       </a>
+      </li>
+      <li>
+       <a @click="submit('pending')">
+        Pending
+       </a>
+      </li>
+     </ul>
+    </li>
+   </ul>
+  </menu>
+
+  <div v-show="hasSyncError">
+   <header class="alert danger">
+    <div>
+     <span>&#8505;</span>
+     <small>{{ rowData.xero_exception_message }}</small>
+    </div>
+    <button>&#9747;</button>
+   </header>
+   <button
+           class="button right"
+           @click="retrySync"
+   >
+    <icon
+            name="xero-red"
+            :width="50"
+            :height="50"
+    />
+   </button>
+  </div>
+ </td>
 </template>
 
 <script>
 export default {
-    name: "UpdateLeaveStatus",
+ name: "UpdateLeaveStatus",
 
-    props: {
-        rowData: {
-            type: Object,
-            required: true
-        },
-        rowIndex: {
-            type: Number
-        },
-        rowField: {
-            type: [String, Object]
-        },
-    },
+ props: {
+  rowData: {
+   type: Object,
+   required: true
+  },
+  rowIndex: {
+   type: Number
+  },
+  rowField: {
+   type: [String, Object]
+  },
+ },
 
-    data() {
-        return {
-            currentStatus: this.rowData.status,
-        }
-    },
+ data() {
+  return {
+   currentStatus: this.rowData.status,
+   hasSyncError: this.rowData.has_xero_sync_error,
+  }
+ },
 
-    methods: {
-        submit(value) {
-            axios.patch(this.rowData.update_status_url, {
-                action: value,
-            }).then(({data}) => {
-                this.currentStatus = data.status;
-            }).catch((errors) => {
-                console.error(errors);
-            });
-        }
-    }
+ methods: {
+  submit(value) {
+   axios.patch(this.rowData.update_status_url, {
+    action: value,
+   }).then(({data}) => {
+    this.currentStatus = data.status;
+   }).catch((errors) => {
+    console.error(errors);
+   });
+  },
+  retrySync() {
+   axios.get(this.rowData.retry_sync_url).then(({data}) => {
+    this.hasSyncError = false;
+   }).catch((errors) => {
+    console.error(errors);
+   });
+  }
+ }
 }
 </script>
 
@@ -186,15 +214,61 @@ export default {
 
 ## Routes
 
-Currently there is one route that accompanies the above vue component
+Below lists the routes available within this package. It is suggested you check the middleware used and update the configuration accordingly.
+
+`xero_leave.update-status` updates the status used for sending to xero when approval is required.
+`xero_leave.retry-sync` is an endpoint that can be used to retry sending a leave request to xero in case there was an issue.
 
 ```bash
-+--------+--------+----------------------------------+--------------------------+---------+----------------------------------+
-| Domain | Method | URI                              | Name                     | Action  | Middleware                       |
-+--------+--------+----------------------------------+--------------------------+---------+----------------------------------+
-|        | PATCH  | xero-leave/update-status/{leave} | xero_leave.update-status | Closure | web                              |
-|        |        |                                  |                          |         | App\Http\Middleware\Authenticate |
-+--------+--------+----------------------------------+--------------------------+---------+----------------------------------+
++--------+----------+----------------------------------+--------------------------+---------------------------------------------------------------------+----------------------------------+
+| Domain | Method   | URI                              | Name                     | Action                                                              | Middleware                       |
++--------+----------+----------------------------------+--------------------------+---------------------------------------------------------------------+----------------------------------+
+|        | GET|HEAD | xero-leave/retry-sync/{leave}    | xero_leave.retry-sync    | Dcodegroup\LaravelXeroLeave\Http\Controllers\RetrySyncController    | web                              |
+|        |          |                                  |                          |                                                                     | App\Http\Middleware\Authenticate |
+|        | PATCH    | xero-leave/update-status/{leave} | xero_leave.update-status | Dcodegroup\LaravelXeroLeave\Http\Controllers\UpdateStatusController | web                              |
+|        |          |                                  |                          |                                                                     | App\Http\Middleware\Authenticate |
++--------+----------+----------------------------------+--------------------------+---------------------------------------------------------------------+----------------------------------+
+```
+
+## HTTP Resources
+
+When returning the data for `Leave` you most likely are using a resource. There are some elements you should add to your leave resources. See example below.
+
+```php 
+<?php
+
+namespace App\Http\Resources\Admin;
+
+use Dcodegroup\LaravelConfiguration\Models\Configuration;
+use Illuminate\Http\Resources\Json\JsonResource;
+
+class Leave extends JsonResource
+{
+    /**
+     * Transform the resource into an array.
+     *
+     * @param \Illuminate\Http\Request $request
+     *
+     * @return array|\Illuminate\Contracts\Support\Arrayable|\JsonSerializable
+     */
+    public function toArray($request)
+    {
+        $data = parent::toArray($request);
+
+       
+        $data['status'] = $this->status;
+        $data['user'] = optional($this->leaveable)->preferred_name ?? optional($this->leaveable)->name;
+        $data['leave_type'] = data_get(Configuration::byKey('xero_leave_types')->pluck('value')->flatten(1)->where('LeaveTypeID', $this->xero_leave_type_id)->first(), 'Name');
+        $data['update_status_url'] = route('xero_leave.update-status', $this);
+        $data['has_xero_sync_error'] = (bool) $this->hasSyncError();
+        
+        /**
+         *  Optional
+         */
+        $data['start_date'] = $this->start_date->format(config('gradcon.date_format'));
+        $data['end_date'] = $this->end_date->format(config('gradcon.date_format'));
+        
+        ...
 ```
 
 ## Events 
