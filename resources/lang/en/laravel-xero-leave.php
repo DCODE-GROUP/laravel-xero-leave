@@ -8,7 +8,7 @@ return [
     'status' => [
         'approved' => 'Approved',
         'declined' => 'Declined',
-        'pending' => 'Awaiting Approval',
+        'pending' => 'Pending',
         'unknown' => 'Something is wrong',
     ],
 

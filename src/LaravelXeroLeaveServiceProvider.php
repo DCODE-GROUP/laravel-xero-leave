@@ -8,8 +8,10 @@ use Dcodegroup\LaravelXeroLeave\Events\SendLeaveToXero;
 use Dcodegroup\LaravelXeroLeave\Listeners\SendToXeroListener;
 use Dcodegroup\LaravelXeroLeave\Observers\LaravelXeroLeaveObserver;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Str;
 use XeroPHP\Application;
 
 class LaravelXeroLeaveServiceProvider extends ServiceProvider
@@ -28,7 +30,7 @@ class LaravelXeroLeaveServiceProvider extends ServiceProvider
         Event::listen(SendLeaveToXero::class, SendToXeroListener::class);
 
         $this->registerResources();
-        //$this->registerRoutes();
+        $this->registerRoutes();
     }
 
     public function register()
@@ -72,14 +74,14 @@ class LaravelXeroLeaveServiceProvider extends ServiceProvider
         //$this->loadViewsFrom(__DIR__.'/../resources/views', 'laravel-xero-leave-views');
     }
 
-    //protected function registerRoutes()
-    //{
-    //    Route::group([
-    //                     'prefix' => config('laravel-xero-leave.path'),
-    //                     'as' => Str::slug(config('laravel-xero-leave.as'), '_').'.',
-    //                     'middleware' => config('laravel-xero-leave.middleware', 'web'),
-    //                 ], function () {
-    //        $this->loadRoutesFrom(__DIR__.'/../routes/laravel_xero_leave.php');
-    //    });
-    //}
+    protected function registerRoutes()
+    {
+        Route::group([
+                         'prefix' => config('laravel-xero-leave.path'),
+                         'as' => Str::slug(config('laravel-xero-leave.as'), '_').'.',
+                         'middleware' => config('laravel-xero-leave.middleware', 'web'),
+                     ], function () {
+            $this->loadRoutesFrom(__DIR__.'/../routes/laravel_xero_leave.php');
+        });
+    }
 }
