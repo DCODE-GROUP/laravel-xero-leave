@@ -40,9 +40,7 @@ class BaseXeroLeaveService extends BaseXeroService
 
         $leave->xero_employee_id = $user->xero_employee_id;
 
-        $leave->save();
-
-        $leave->leavable()->attach($user);
+        $user->leave()->save($leave);
 
         return $leave->fresh();
     }

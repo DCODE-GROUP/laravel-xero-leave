@@ -8,6 +8,6 @@ trait HasLeave
 {
     public function leave(): MorphMany
     {
-        return $this->morphMany(config('laravel-xero-leave.leave_model'), 'leavable');
+        return $this->morphMany(config('laravel-xero-leave.leave_model'), 'leaveable');
     }
 }
