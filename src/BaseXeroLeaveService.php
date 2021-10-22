@@ -72,6 +72,7 @@ class BaseXeroLeaveService extends BaseXeroService
              * is the same day so we need to work out the period.
              * units are not empty so its less than a day
              */
+            $objects = $this->createPeriod($leave);
         }
 
         $leaveParameters = [
@@ -84,8 +85,6 @@ class BaseXeroLeaveService extends BaseXeroService
         ];
 
         if ($leave->hasXeroLeaveApplicationId()) {
-            logger('got into update');
-
             return $this->updateModel(LeaveApplication::class, (object) [
                 'identifier' => 'LeaveApplicationID',
                 'guid' => $leave->xero_leave_application_id,
@@ -95,7 +94,9 @@ class BaseXeroLeaveService extends BaseXeroService
         return $this->saveModel(LeaveApplication::class, $leaveParameters, $objects);
     }
 
-    private function createPeriod()
+    private function createPeriod(Model $leave)
     {
+
+
     }
 }
