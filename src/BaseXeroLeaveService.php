@@ -96,7 +96,5 @@ class BaseXeroLeaveService extends BaseXeroService
 
     private function createPeriod(Model $leave)
     {
-
-
     }
 }
