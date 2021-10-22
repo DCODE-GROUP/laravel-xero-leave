@@ -90,6 +90,14 @@ class Leave extends Model
         event(new LeaveDeclined($this));
     }
 
+    public function pending(): void
+    {
+        $this->update([
+                          'approved_at' => null,
+                          'declined_at' => null,
+                      ]);
+    }
+
     public function getStatusAttribute(): string
     {
         if (config('laravel-xero-leave.applications_require_approval') && empty($this->approved_at) && empty($this->declined_at)) {
