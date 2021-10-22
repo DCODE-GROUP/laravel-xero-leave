@@ -81,7 +81,7 @@ class LaravelXeroLeaveServiceProvider extends ServiceProvider
                          'as' => Str::slug(config('laravel-xero-leave.as'), '_').'.',
                          'middleware' => config('laravel-xero-leave.middleware', 'web'),
                      ], function () {
-            $this->loadRoutesFrom(__DIR__.'/../routes/laravel_xero_leave.php');
-        });
+                         $this->loadRoutesFrom(__DIR__.'/../routes/laravel_xero_leave.php');
+                     });
     }
 }
