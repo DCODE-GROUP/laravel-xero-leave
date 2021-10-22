@@ -10,6 +10,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Cache;
+use XeroAPI\XeroPHP\ApiException;
 use XeroPHP\Models\PayrollAU\LeaveApplication;
 
 class SyncLeavetoXero implements ShouldQueue
@@ -36,6 +38,15 @@ class SyncLeavetoXero implements ShouldQueue
         $response = $service->sendLeaveToXero($this->leave);
 
         logger('response: '.json_encode($response));
+
+        if ($response instanceof ApiException && $response->getCode() == 429) {
+            report($response);
+            $secondsRemaining = $response->getResponseObject()->header('Retry-After');
+
+            Cache::put('xero-api-limit', now()->addSeconds($secondsRemaining)->timestamp, $secondsRemaining);
+
+            $this->release($secondsRemaining);
+        }
 
         if ($response instanceof Exception) {
             report($response);

@@ -3,6 +3,7 @@
 namespace Dcodegroup\LaravelXeroLeave\Observers;
 
 use Dcodegroup\LaravelXeroLeave\Events\RequestLeaveApproval;
+use Dcodegroup\LaravelXeroLeave\Events\SendLeaveToXero;
 use Illuminate\Database\Eloquent\Model;
 
 class LaravelXeroLeaveObserver
@@ -18,15 +19,8 @@ class LaravelXeroLeaveObserver
 
     public function updated(Model $leave)
     {
-        logger($leave);
-        logger('declined at changed: '.$leave->wasChanged('declined_at'));
-        logger('approved at changed: '.$leave->wasChanged('approved_at'));
-    }
-
-    public function saved(Model $leave)
-    {
-        logger($leave);
-        logger('declined at changed: '.$leave->wasChanged('declined_at'));
-        logger('approved at changed: '.$leave->wasChanged('approved_at'));
+        if ($leave->shouldUpdateXero()) {
+            event(new SendLeaveToXero($leave));
+        }
     }
 }

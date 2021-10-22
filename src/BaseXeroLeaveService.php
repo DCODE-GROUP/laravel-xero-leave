@@ -84,6 +84,7 @@ class BaseXeroLeaveService extends BaseXeroService
         ];
 
         if ($leave->hasXeroLeaveApplicationId()) {
+            logger('got into update');
             return $this->updateModel(LeaveApplication::class, (object) [
                 'identifier' => 'LeaveApplicationID',
                 'guid' => $leave->xero_leave_application_id,
