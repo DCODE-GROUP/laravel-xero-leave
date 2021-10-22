@@ -38,7 +38,7 @@ class Leave extends Model
         'xero_synced_at' => 'datetime',
     ];
 
-    public function leavable(): MorphTo
+    public function leaveable(): MorphTo
     {
         return $this->morphTo();
     }
