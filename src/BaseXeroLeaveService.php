@@ -9,7 +9,7 @@ use Dcodegroup\LaravelXeroOauth\BaseXeroService;
 use Exception;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
-use XeroAPI\XeroPHP\Models\PayrollAu\LeaveApplication;
+use XeroPHP\Models\PayrollAU\LeaveApplication;
 use XeroPHP\Models\PayrollAU\PayItem;
 
 class BaseXeroLeaveService extends BaseXeroService
