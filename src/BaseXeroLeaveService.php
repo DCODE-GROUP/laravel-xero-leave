@@ -6,7 +6,6 @@ use App\Models\User;
 use Dcodegroup\LaravelXeroLeave\Exceptions\XeroMissingemployeeIdException;
 use Dcodegroup\LaravelXeroLeave\Models\Leave;
 use Dcodegroup\LaravelXeroOauth\BaseXeroService;
-use Exception;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use XeroPHP\Models\PayrollAU\LeaveApplication;
@@ -29,7 +28,14 @@ class BaseXeroLeaveService extends BaseXeroService
         $leave = $leave ?: new Leave();
         $user = User::findOrFail($request->input('leaveable_id'));
 
-        $leave->fill($request->only(['title', 'description', 'start_date', 'end_date', 'xero_leave_type_id', 'units']));
+        $leave->fill($request->only([
+            'title',
+            'description',
+            'start_date',
+            'end_date',
+            'xero_leave_type_id',
+            'units',
+        ]));
 
         // Validate the units
         if ($request->input('start_date') != $request->input('end_date')) {
@@ -44,6 +50,15 @@ class BaseXeroLeaveService extends BaseXeroService
         return $leave->fresh();
     }
 
+    /**
+     * This is called from src/Jobs/SyncLeavetoXero.php and error handling and result of this action is handled in the
+     * job. This allows us to not retry if it failed due to some exception.
+     *
+     * @param  \Illuminate\Database\Eloquent\Model  $leave
+     *
+     * @return mixed|\XeroPHP\Remote\Model|null
+     * @throws \Dcodegroup\LaravelXeroLeave\Exceptions\XeroMissingemployeeIdException
+     */
     public function sendLeaveToXero(Model $leave)
     {
         if (empty($leave->leaveable->xero_employee_id)) {
@@ -52,7 +67,7 @@ class BaseXeroLeaveService extends BaseXeroService
 
         $objects = [];
 
-        if ($leave->start_date->eq($leave->end_date) && ! empty($leave->units)) {
+        if ($leave->start_date->eq($leave->end_date) && !empty($leave->units)) {
             /*
              * is the same day so we need to work out the period.
              * units are not empty so its less than a day
@@ -69,40 +84,13 @@ class BaseXeroLeaveService extends BaseXeroService
         ];
 
         if ($leave->hasXeroLeaveApplicationId()) {
-            $response = $this->updateModel(
-                LeaveApplication::class,
-                (object) [
-                    'identifier' => 'LeaveApplicationID',
-                    'guid' => $leave->xero_leave_application_id,
-                ],
-                $leaveParameters,
-            );
-        } else {
-            $response = $this->saveModel(
-                LeaveApplication::class,
-                $leaveParameters,
-                $objects
-            );
+            return $this->updateModel(LeaveApplication::class, (object) [
+                'identifier' => 'LeaveApplicationID',
+                'guid' => $leave->xero_leave_application_id,
+            ], $leaveParameters, );
         }
 
-        logger('response: '.json_encode($response));
-
-        if ($response instanceof Exception) {
-            report($response);
-            $leave->update([
-                'xero_exception_message' => $response->getMessage(),
-                'xero_exception' => json_encode($response),
-            ]);
-        }
-
-        if ($response instanceof LeaveApplication) {
-            $leave->update([
-                'xero_synced_at' => now(),
-                'xero_leave_application_id' => $response->getLeaveApplicationID(),
-                'xero_exception_message' => null,
-                'xero_exception' => null,
-            ]);
-        }
+        return $this->saveModel(LeaveApplication::class, $leaveParameters, $objects);
     }
 
     private function createPeriod()

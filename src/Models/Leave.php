@@ -93,9 +93,9 @@ class Leave extends Model
     public function pending(): void
     {
         $this->update([
-                          'approved_at' => null,
-                          'declined_at' => null,
-                      ]);
+            'approved_at' => null,
+            'declined_at' => null,
+        ]);
     }
 
     public function getStatusAttribute(): string
@@ -104,11 +104,11 @@ class Leave extends Model
             return __('laravel-xero-leave-translations::laravel-xero-leave.status.pending');
         }
 
-        if (! empty($this->approved_at)) {
+        if (!empty($this->approved_at)) {
             return __('laravel-xero-leave-translations::laravel-xero-leave.status.approved');
         }
 
-        if (! empty($this->declined_at)) {
+        if (!empty($this->declined_at)) {
             return __('laravel-xero-leave-translations::laravel-xero-leave.status.declined');
         }
 
@@ -117,6 +117,11 @@ class Leave extends Model
 
     public function hasXeroLeaveApplicationId(): bool
     {
-        return ! empty($this->xero_leave_application_id);
+        return !empty($this->xero_leave_application_id);
+    }
+
+    public function hasSyncError(): bool
+    {
+        return !empty($this->xero_exception_message);
     }
 }
