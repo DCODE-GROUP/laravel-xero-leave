@@ -67,7 +67,7 @@ class BaseXeroLeaveService extends BaseXeroService
 
         $objects = [];
 
-        if ($leave->start_date->eq($leave->end_date) && !empty($leave->units)) {
+        if ($leave->start_date->eq($leave->end_date) && ! empty($leave->units)) {
             /*
              * is the same day so we need to work out the period.
              * units are not empty so its less than a day
