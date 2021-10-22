@@ -127,10 +127,9 @@ class Leave extends Model
 
     public function shouldUpdateXero(): bool
     {
-
         if ($this->wasChanged(['start_date', 'end_date', 'units']) && $this->hasXeroLeaveApplicationId()) {
             if (config('laravel-xero-leave.applications_require_approval')) {
-                return !empty($this->approved_at);
+                return ! empty($this->approved_at);
             }
 
             return true;
