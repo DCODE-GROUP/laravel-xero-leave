@@ -108,6 +108,95 @@ class User extends Authenticatable
     ...
 ```
 
+Example Vue component to update the status of leave that require approval
+
+```vue
+<template>
+  <td>
+    <menu>
+      <ul>
+        <li>
+          <button class="button primary active">
+            {{ currentStatus }}
+          </button>
+          <ul class="right">
+            <li>
+              <a @click="submit('approve')">
+                Approve
+              </a>
+            </li>
+            <li>
+              <a @click="submit('decline')">
+                Decline
+              </a>
+            </li>
+            <li>
+              <a @click="submit('pending')">
+                Pending
+              </a>
+            </li>
+          </ul>
+        </li>
+      </ul>
+    </menu>
+  </td>
+</template>
+
+<script>
+export default {
+    name: "UpdateLeaveStatus",
+
+    props: {
+        rowData: {
+            type: Object,
+            required: true
+        },
+        rowIndex: {
+            type: Number
+        },
+        rowField: {
+            type: [String, Object]
+        },
+    },
+
+    data() {
+        return {
+            currentStatus: this.rowData.status,
+        }
+    },
+
+    methods: {
+        submit(value) {
+            axios.patch(this.rowData.update_status_url, {
+                action: value,
+            }).then(({data}) => {
+                this.currentStatus = data.status;
+            }).catch((errors) => {
+                console.error(errors);
+            });
+        }
+    }
+}
+</script>
+
+<style scoped>
+
+</style>
+```
+
+## Routes
+
+Currently there is one route that accompanies the above vue component
+
+```bash
++--------+--------+----------------------------------+--------------------------+---------+----------------------------------+
+| Domain | Method | URI                              | Name                     | Action  | Middleware                       |
++--------+--------+----------------------------------+--------------------------+---------+----------------------------------+
+|        | PATCH  | xero-leave/update-status/{leave} | xero_leave.update-status | Closure | web                              |
+|        |        |                                  |                          |         | App\Http\Middleware\Authenticate |
++--------+--------+----------------------------------+--------------------------+---------+----------------------------------+
+```
+
 ## Events 
 
 Communicating with Xero works by firing events. These events have listeners which will fire the listeners and dispatch jobs.
