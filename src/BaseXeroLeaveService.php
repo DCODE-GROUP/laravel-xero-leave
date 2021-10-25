@@ -138,8 +138,8 @@ class BaseXeroLeaveService extends BaseXeroService
                                     ->get()
                                     ->pluck('value')
                                     ->first())->first(function ($value, $key) use ($payrollCalendarId) {
-            return data_get($value, 'PayrollCalendarID') == $payrollCalendarId;
-        });
+                                        return data_get($value, 'PayrollCalendarID') == $payrollCalendarId;
+                                    });
     }
 
     /**
