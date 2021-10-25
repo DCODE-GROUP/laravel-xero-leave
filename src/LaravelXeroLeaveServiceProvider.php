@@ -2,6 +2,8 @@
 
 namespace Dcodegroup\LaravelXeroLeave;
 
+use Carbon\Carbon;
+use Carbon\CarbonPeriod;
 use Dcodegroup\LaravelXeroLeave\Commands\AutoUpdateXeroConfigurationData;
 use Dcodegroup\LaravelXeroLeave\Commands\InstallCommand;
 use Dcodegroup\LaravelXeroLeave\Events\SendLeaveToXero;
@@ -40,6 +42,8 @@ class LaravelXeroLeaveServiceProvider extends ServiceProvider
         $this->app->bind(BaseXeroLeaveService::class, function () {
             return new BaseXeroLeaveService(resolve(Application::class));
         });
+
+        $this->registerCarbonMacros();
     }
 
     /**
@@ -83,5 +87,20 @@ class LaravelXeroLeaveServiceProvider extends ServiceProvider
                      ], function () {
                          $this->loadRoutesFrom(__DIR__.'/../routes/laravel_xero_leave.php');
                      });
+    }
+
+    /**
+     * This too has been copied from dcodegroup/laravel-xero-timesheet-sync and is another reason it should be
+     * made into its own package
+     */
+    public function registerCarbonMacros()
+    {
+        Carbon::macro('addFortnight', function () {
+            return $this->addWeeks(2);
+        });
+
+        Carbon::macro('fortnightUntil', function ($date) {
+            return CarbonPeriod::create($this, '14 days', $date);
+        });
     }
 }
