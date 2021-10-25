@@ -75,7 +75,6 @@ class LaravelXeroLeaveServiceProvider extends ServiceProvider
     protected function registerResources()
     {
         $this->loadTranslationsFrom(__DIR__.'/../resources/lang', 'laravel-xero-leave-translations');
-        //$this->loadViewsFrom(__DIR__.'/../resources/views', 'laravel-xero-leave-views');
     }
 
     protected function registerRoutes()

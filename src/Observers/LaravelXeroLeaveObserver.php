@@ -10,9 +10,12 @@ class LaravelXeroLeaveObserver
 {
     public function created(Model $leave)
     {
+        logger('got into created');
         if (config('laravel-xero-leave.applications_require_approval')) {
+            logger('got into fire request approval');
             event(new RequestLeaveApproval($leave));
         } else {
+            logger('got into auto approve');
             $leave->approve();
         }
     }
