@@ -7,7 +7,6 @@ use Carbon\Carbon;
 use Dcodegroup\LaravelConfiguration\Models\Configuration;
 use Dcodegroup\LaravelXeroLeave\Exceptions\XeroMissingDefaultCalendarIDException;
 use Dcodegroup\LaravelXeroLeave\Exceptions\XeroMissingEmployeeIdException;
-use Dcodegroup\LaravelXeroLeave\Models\Leave;
 use Dcodegroup\LaravelXeroOauth\BaseXeroService;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
@@ -27,9 +26,10 @@ class BaseXeroLeaveService extends BaseXeroService
         return $this->getModel(PayItem::class, null, 'LeaveTypes');
     }
 
-    public function save(Request $request, Model $leave = null): Model|Leave|null
+    public function save(Request $request, Model $leave = null): Model
     {
-        $leave = $leave ?: new Leave();
+        $leaveClass = config('laravel-xero-leave.leave_model');
+        $leave = $leave ?: new $leaveClass;
         $user = User::findOrFail($request->input('leaveable_id'));
 
         $leave->fill($request->only([
@@ -51,7 +51,7 @@ class BaseXeroLeaveService extends BaseXeroService
 
         $user->leave()->save($leave);
 
-        return $leave->fresh();
+        return $leave;
     }
 
     /**

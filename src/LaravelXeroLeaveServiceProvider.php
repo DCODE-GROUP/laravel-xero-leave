@@ -27,7 +27,7 @@ class LaravelXeroLeaveServiceProvider extends ServiceProvider
         $this->registerCommands();
 
         $leaveClass = config('laravel-xero-leave.leave_model');
-        $leaveClass::observe(new LaravelXeroLeaveObserver());
+        $leaveClass::observe(LaravelXeroLeaveObserver::class);
 
         Event::listen(SendLeaveToXero::class, SendToXeroListener::class);
 
