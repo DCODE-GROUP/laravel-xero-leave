@@ -97,6 +97,7 @@ class Leave extends Model
         $this->update([
             'approved_at' => null,
             'declined_at' => null,
+            'decline_reason' => null,
         ]);
     }
 
