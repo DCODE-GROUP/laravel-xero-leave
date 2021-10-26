@@ -77,7 +77,6 @@ class BaseXeroLeaveService extends BaseXeroService
              * units are not empty so its less than a day
              */
             $objects = $this->createPeriod($leave);
-            logger($objects);
         }
 
         $leaveParameters = [
