@@ -5,7 +5,7 @@ namespace Dcodegroup\LaravelXeroLeave\Events;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Queue\SerializesModels;
 
-class RequestLeaveApproval
+class LeaveRequested
 {
     use SerializesModels;
 

@@ -2,7 +2,7 @@
 
 namespace Dcodegroup\LaravelXeroLeave\Observers;
 
-use Dcodegroup\LaravelXeroLeave\Events\RequestLeaveApproval;
+use Dcodegroup\LaravelXeroLeave\Events\LeaveRequested;
 use Dcodegroup\LaravelXeroLeave\Events\SendLeaveToXero;
 use Illuminate\Database\Eloquent\Model;
 
@@ -11,7 +11,7 @@ class LaravelXeroLeaveObserver
     public function created(Model $leave)
     {
         if (config('laravel-xero-leave.applications_require_approval')) {
-            event(new RequestLeaveApproval($leave));
+            event(new LeaveRequested($leave));
         } else {
             $leave->approve();
         }
