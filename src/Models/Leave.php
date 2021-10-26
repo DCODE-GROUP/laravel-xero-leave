@@ -71,6 +71,7 @@ class Leave extends Model
         $this->update([
             'approved_at' => now(),
             'declined_at' => null,
+            'decline_reason' => null,
         ]);
 
         if (config('laravel-xero-leave.applications_require_approval')) {
@@ -80,11 +81,12 @@ class Leave extends Model
         event(new SendLeaveToXero($this));
     }
 
-    public function decline(): void
+    public function decline(string $reason = null): void
     {
         $this->update([
             'approved_at' => null,
             'declined_at' => now(),
+            'decline_reason' => $reason,
         ]);
 
         event(new LeaveDeclined($this));

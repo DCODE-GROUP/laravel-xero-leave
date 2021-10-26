@@ -100,8 +100,6 @@ class BaseXeroLeaveService extends BaseXeroService
 
     private function createPeriod(Model $leave)
     {
-        // Employee calendar or default
-
         $calendarId = $leave->leaveable->xero_default_payroll_calendar_id;
 
         if (empty($calendarId)) {
