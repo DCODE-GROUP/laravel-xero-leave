@@ -24,6 +24,7 @@ class CreateLeavesTable extends Migration
             $table->mediumText('xero_exception')->nullable();
             $table->timestamp('approved_at')->nullable();
             $table->timestamp('declined_at')->nullable();
+            $table->text('decline_reason')->nullable();
             $table->timestamp('xero_synced_at')->nullable();
             $table->softDeletes();
             $table->timestamps();
