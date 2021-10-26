@@ -68,6 +68,7 @@ xero_periods json NULL
 xero_exception_message text NULL
 approved_at timestamp NULL
 declined_at timestamp NULL
+decline_reason text NULL
 xero_synced_at timestamp NULL
 deleted_at timestamp NULL
 created_at timestamp NULL
@@ -122,17 +123,27 @@ Example Vue component to update the status of leave that require approval
      <ul class="right">
       <li>
        <a @click="submit('approve')">
-        Approve
+        {{ $t('leave.status.approve') }}
        </a>
       </li>
       <li>
-       <a @click="submit('decline')">
-        Decline
+       <a @click="showReason = true;">
+        {{ $t('leave.status.decline') }}
        </a>
+       <div v-show="showReason">
+        <input
+                v-model="declineReason"
+                type="text"
+                :placeholder="$t('leave.words.reason')"
+        >
+        <button @click="submit('decline')">
+         {{ $t('leave.buttons.save') }}
+        </button>
+       </div>
       </li>
       <li>
        <a @click="submit('pending')">
-        Pending
+        {{ $t('leave.status.pending') }}
        </a>
       </li>
      </ul>
@@ -183,16 +194,30 @@ export default {
   return {
    currentStatus: this.rowData.status,
    hasSyncError: this.rowData.has_xero_sync_error,
+   showReason: false,
+   declineReason: '',
   }
  },
 
  methods: {
   submit(value) {
+   // this.showReason = false;
+
    axios.patch(this.rowData.update_status_url, {
     action: value,
+    reason: this.declineReason,
    }).then(({data}) => {
     this.currentStatus = data.status;
    }).catch((errors) => {
+    if ('reason' in errors.response.data.errors) {
+     this.$notify({
+      group: 'general',
+      title: 'Error!',
+      type: 'error',
+      text: errors.response.data.errors.reason[0]
+     })
+    }
+
     console.error(errors);
    });
   },

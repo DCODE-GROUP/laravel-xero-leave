@@ -21,6 +21,9 @@ class UpdateStatus extends FormRequest
     {
         return [
             'action' => ['required', 'string', Rule::in(['approve', 'decline', 'pending'])],
+            'reason' => ['nullable', 'string', Rule::requiredIf(function () {
+                return $this->get('action') == 'decline';
+            })],
         ];
     }
 }

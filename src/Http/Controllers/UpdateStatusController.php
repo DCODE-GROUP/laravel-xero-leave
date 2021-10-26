@@ -11,7 +11,7 @@ class UpdateStatusController extends Controller
 {
     public function __invoke(UpdateStatus $request, Leave $leave): JsonResponse
     {
-        $leave->{$request->input('action')}();
+        $leave->{$request->input('action')}($request->input('reason'));
 
         return response()->json(['status' => $leave->fresh()->status]);
     }
