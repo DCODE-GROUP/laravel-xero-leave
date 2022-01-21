@@ -27,8 +27,8 @@
   "require": {
     "php": "^7.4 || ^8.0",
     "laravel/framework": "^7.0 |^8.0",
-    "dcodegroup/laravel-configuration": "^0.1",
-    "dcodegroup/laravel-xero-employee": "^0.1"
+    "dcodegroup/laravel-configuration": "dev-develop|^0.1",
+    "dcodegroup/laravel-xero-employee": "dev-develop|^0.1"
   },
   "require-dev": {
     "friendsofphp/php-cs-fixer": "^2.16"
