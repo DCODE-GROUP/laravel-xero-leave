@@ -29,7 +29,7 @@ class AutoUpdateXeroConfigurationData extends Command
     public function handle()
     {
         $force = $this->option('force');
-        $record = Configuration::byKey('xero_leave_types')->first();
+        $record = Configuration::query()->byKey('xero_leave_types')->first();
 
         if ($record->updated_at->gte(now()->subWeek()) || $force) {
             SyncLeaveTypesConfigurationOptions::dispatch();
