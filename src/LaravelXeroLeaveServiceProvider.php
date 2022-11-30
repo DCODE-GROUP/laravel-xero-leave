@@ -9,6 +9,7 @@ use Dcodegroup\LaravelXeroLeave\Commands\InstallCommand;
 use Dcodegroup\LaravelXeroLeave\Events\SendLeaveToXero;
 use Dcodegroup\LaravelXeroLeave\Listeners\SendToXeroListener;
 use Dcodegroup\LaravelXeroLeave\Observers\LaravelXeroLeaveObserver;
+use Exception;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Schema;
@@ -53,12 +54,16 @@ class LaravelXeroLeaveServiceProvider extends ServiceProvider
     {
         $this->publishes([__DIR__.'/../config/laravel-xero-leave.php' => config_path('laravel-xero-leave.php')], 'laravel-xero-leave-config');
 
-        if (! Schema::hasTable('leaves')) {
-            $timestamp = date('Y_m_d_His', time());
+        try {
+            if (! Schema::hasTable('leaves')) {
+                $timestamp = date('Y_m_d_His', time());
 
-            $this->publishes([
-                __DIR__.'/../database/migrations/create_leaves_table.stub.php' => database_path('migrations/'.$timestamp.'_create_leaves_table.php'),
-            ], 'laravel-xero-leave-table-migrations');
+                $this->publishes([
+                    __DIR__.'/../database/migrations/create_leaves_table.stub.php' => database_path('migrations/'.$timestamp.'_create_leaves_table.php'),
+                ], 'laravel-xero-leave-table-migrations');
+            }
+        } catch(Exception $e) {
+            report($e);
         }
     }
 
