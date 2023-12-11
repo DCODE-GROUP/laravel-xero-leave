@@ -26,6 +26,6 @@ return [
     ],
 
     'placeholders' => [
-      'xero_leave_type_id'  => '-- Please Select a Leave Type --'
+        'xero_leave_type_id' => '-- Please Select a Leave Type --',
     ],
 ];

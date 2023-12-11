@@ -26,7 +26,7 @@ class BaseXeroLeaveService extends BaseXeroService
         return $this->getModel(PayItem::class, null, 'LeaveTypes');
     }
 
-    public function save(Request $request, Model $leave = null): Model
+    public function save(Request $request, ?Model $leave = null): Model
     {
         $leaveClass = config('laravel-xero-leave.leave_model');
         $leave = $leave ?: new $leaveClass();
@@ -58,9 +58,9 @@ class BaseXeroLeaveService extends BaseXeroService
      * This is called from src/Jobs/SyncLeavetoXero.php and error handling and result of this action is handled in the
      * job. This allows us to not retry if it failed due to some exception.
      *
-     * @param  \Illuminate\Database\Eloquent\Model  $leave
      *
      * @return mixed|\XeroPHP\Remote\Model|null
+     *
      * @throws \Dcodegroup\LaravelXeroLeave\Exceptions\XeroMissingEmployeeIdException
      */
     public function sendLeaveToXero(Model $leave)
@@ -110,7 +110,7 @@ class BaseXeroLeaveService extends BaseXeroService
 
         $calendarPeriodStarts = $this->buildCalendarPeriodStartDates($calendar);
 
-        $periodDates = collect($calendarPeriodStarts)->map(function ($periodStart) use ($calendar, $leave) {
+        $periodDates = collect($calendarPeriodStarts)->map(function ($periodStart) use ($calendar) {
             $periodEnd = $periodStart->copy()->{$this->getMethodForCalendarType($calendar)}()->subDay();
 
             return [
@@ -132,17 +132,17 @@ class BaseXeroLeaveService extends BaseXeroService
     private function getCalendar(string $payrollCalendarId)
     {
         return collect(Configuration::byKey('xero_payroll_calendars')
-                                    ->get()
-                                    ->pluck('value')
-                                    ->first())->first(function ($value, $key) use ($payrollCalendarId) {
-                                        return data_get($value, 'PayrollCalendarID') == $payrollCalendarId;
-                                    });
+            ->get()
+            ->pluck('value')
+            ->first())->first(function ($value, $key) use ($payrollCalendarId) {
+                return data_get($value, 'PayrollCalendarID') == $payrollCalendarId;
+            });
     }
 
     /**
      * This is taken from dcodegroup/laravel-xero-timesheet-sync PayrollCalendarService.
      */
-    private function generateCalendarPeriods(string $payrollCalendarId = null): array
+    private function generateCalendarPeriods(?string $payrollCalendarId = null): array
     {
         if (is_null($payrollCalendarId)) {
             return [];
@@ -194,31 +194,31 @@ class BaseXeroLeaveService extends BaseXeroService
         switch ($this->getCalendarType($calendar)) {
             case PayrollCalendar::CALENDARTYPE_WEEKLY:
                 return call_user_func_array([
-                                                $date,
-                                                'weeksUntil',
-                                            ], [$this->generatePaymentDatesUntil($calendar)]);
+                    $date,
+                    'weeksUntil',
+                ], [$this->generatePaymentDatesUntil($calendar)]);
 
             case PayrollCalendar::CALENDARTYPE_FORTNIGHTLY:
             case PayrollCalendar::CALENDARTYPE_TWICEMONTHLY:
                 return call_user_func_array([
-                                                $date,
-                                                'fortnightUntil',
-                                            ], [
-                                                $this->generatePaymentDatesUntil($calendar),
-                                            ]);
+                    $date,
+                    'fortnightUntil',
+                ], [
+                    $this->generatePaymentDatesUntil($calendar),
+                ]);
 
             case PayrollCalendar::CALENDARTYPE_MONTHLY:
             case PayrollCalendar::CALENDARTYPE_FOURWEEKLY:
                 return call_user_func_array([
-                                                $date,
-                                                'monthsUntil',
-                                            ], [$this->generatePaymentDatesUntil($calendar)]);
+                    $date,
+                    'monthsUntil',
+                ], [$this->generatePaymentDatesUntil($calendar)]);
 
             case PayrollCalendar::CALENDARTYPE_QUARTERLY:
                 return call_user_func_array([
-                                                $date,
-                                                'quartersUntil',
-                                            ], [$this->generatePaymentDatesUntil($calendar)]);
+                    $date,
+                    'quartersUntil',
+                ], [$this->generatePaymentDatesUntil($calendar)]);
         }
     }
 

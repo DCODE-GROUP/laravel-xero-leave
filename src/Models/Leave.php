@@ -81,7 +81,7 @@ class Leave extends Model
         event(new SendLeaveToXero($this));
     }
 
-    public function decline(string $reason = null): void
+    public function decline(?string $reason = null): void
     {
         $this->update([
             'approved_at' => null,

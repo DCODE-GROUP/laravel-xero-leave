@@ -62,7 +62,7 @@ class LaravelXeroLeaveServiceProvider extends ServiceProvider
                     __DIR__.'/../database/migrations/create_leaves_table.stub.php' => database_path('migrations/'.$timestamp.'_create_leaves_table.php'),
                 ], 'laravel-xero-leave-table-migrations');
             }
-        } catch(Exception $e) {
+        } catch (Exception $e) {
             report($e);
         }
     }
@@ -85,12 +85,12 @@ class LaravelXeroLeaveServiceProvider extends ServiceProvider
     protected function registerRoutes()
     {
         Route::group([
-                         'prefix' => config('laravel-xero-leave.path'),
-                         'as' => Str::slug(config('laravel-xero-leave.as'), '_').'.',
-                         'middleware' => config('laravel-xero-leave.middleware', 'web'),
-                     ], function () {
-                         $this->loadRoutesFrom(__DIR__.'/../routes/laravel_xero_leave.php');
-                     });
+            'prefix' => config('laravel-xero-leave.path'),
+            'as' => Str::slug(config('laravel-xero-leave.as'), '_').'.',
+            'middleware' => config('laravel-xero-leave.middleware', 'web'),
+        ], function () {
+            $this->loadRoutesFrom(__DIR__.'/../routes/laravel_xero_leave.php');
+        });
     }
 
     /**

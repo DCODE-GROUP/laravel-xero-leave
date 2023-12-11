@@ -27,7 +27,7 @@ class StoreLeave extends FormRequest
             'start_date' => 'required|date|before_or_equal:end_date',
             'title' => 'required|min:3|max:50',
             'units' => 'nullable|numeric|min:0.5|max:'.config('laravel-xero-leave.default_work_hours'),
-            'xero_leave_type_id' => ['required','string', Rule::in(Leave::getValidXeroLeaveTypes())],
+            'xero_leave_type_id' => ['required', 'string', Rule::in(Leave::getValidXeroLeaveTypes())],
         ];
     }
 }
