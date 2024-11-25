@@ -29,7 +29,7 @@ class BaseXeroLeaveService extends BaseXeroService
     public function save(Request $request, ?Model $leave = null): Model
     {
         $leaveClass = config('laravel-xero-leave.leave_model');
-        $leave = $leave ?: new $leaveClass();
+        $leave = $leave ?: new $leaveClass;
         $user = User::findOrFail($request->input('leaveable_id'));
 
         $leave->fill($request->only([
@@ -121,7 +121,7 @@ class BaseXeroLeaveService extends BaseXeroService
             return $leave->start_date->between($item['periodStart'], $item['periodEnd']);
         });
 
-        $period = new LeaveApplication\LeavePeriod();
+        $period = new LeaveApplication\LeavePeriod;
         $period->setNumberOfUnit($leave->units);
         $period->setPayPeriodStartDate($periodDates['periodStart']);
         $period->setPayPeriodEndDate($periodDates['periodEnd']);
