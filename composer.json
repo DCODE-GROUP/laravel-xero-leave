@@ -26,7 +26,7 @@
   ],
   "require": {
     "php": "^7.4||^8.0",
-    "laravel/framework": "^7.0|^8.0|^9.0|^10.0",
+    "laravel/framework": "^7.0|^8.0|^9.0|^10.0|^11.0",
     "dcodegroup/laravel-configuration": "^0.2",
     "dcodegroup/laravel-xero-employee": "^0.1"
   },
