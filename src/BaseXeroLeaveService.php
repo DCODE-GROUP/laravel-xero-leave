@@ -10,16 +10,18 @@ use Dcodegroup\LaravelXeroLeave\Exceptions\XeroMissingEmployeeIdException;
 use Dcodegroup\LaravelXeroOauth\BaseXeroService;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use XeroPHP\Models\PayrollAU\LeaveApplication;
 use XeroPHP\Models\PayrollAU\PayItem;
 use XeroPHP\Models\PayrollAU\PayrollCalendar;
+use XeroPHP\Remote\Query;
 
 class BaseXeroLeaveService extends BaseXeroService
 {
     /**
      * Actually have this same method in BaseXeroPayrollAuService However I am not requiring that in this package.
      *
-     * @return null|\Illuminate\Support\Collection|\XeroPHP\Remote\Collection|\XeroPHP\Remote\Model|\XeroPHP\Remote\Query
+     * @return null|Collection|\XeroPHP\Remote\Collection|\XeroPHP\Remote\Model|Query
      */
     public function getLeaveTypes()
     {
@@ -61,7 +63,7 @@ class BaseXeroLeaveService extends BaseXeroService
      *
      * @return mixed|\XeroPHP\Remote\Model|null
      *
-     * @throws \Dcodegroup\LaravelXeroLeave\Exceptions\XeroMissingEmployeeIdException
+     * @throws XeroMissingEmployeeIdException
      */
     public function sendLeaveToXero(Model $leave)
     {

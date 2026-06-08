@@ -1,5 +1,7 @@
 <?php
 
+use Dcodegroup\LaravelXeroLeave\Models\Leave;
+
 return [
     /*
     * --------------------------------------------------------------------------
@@ -16,7 +18,7 @@ return [
      * The assumption is this will be the model used for timesheets.
      * You should update this to match your timesheet model. Should be this
      */
-    'leave_model' => Dcodegroup\LaravelXeroLeave\Models\Leave::class,
+    'leave_model' => Leave::class,
 
     /*
      * Some apps require leave to be approved others do not. We provide the functionality to select if a leave request
